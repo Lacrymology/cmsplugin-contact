@@ -8,10 +8,17 @@ class RecaptchaResponse(forms.Widget):
 
     def render(self, *args, **kwargs):
         from recaptcha.client import captcha as recaptcha
-        recaptcha_options = """<script type="text/javascript"> var RecaptchaOptions = { theme: '""" + self.theme + \
-                            "', lang: '" + get_language()[0:2] + \
-                            ("', custom_theme_widget: 'recaptcha_widget'" if self.theme == 'custom' else "'") + " }; </script>\n"
-        return mark_safe(recaptcha_options + recaptcha.displayhtml(self.public_key))
+        recaptcha_options = ("""<script type="text/javascript"> """
+                             """var RecaptchaOptions = { theme: '%(theme)s', """
+                                """lang: '%(language)s', """
+                                """custom_theme_widget: '%(widget)s'}; """
+                             """</script>\n"""%{
+                    'theme': self.theme,
+                    'language': get_language()[0:2],
+                    'widget': ('recaptcha_widget' if self.theme == 'custom'
+                               else '')})
+        return mark_safe(recaptcha_options + 
+                         recaptcha.displayhtml(self.public_key))
 
 
 class RecaptchaChallenge(forms.Widget):
